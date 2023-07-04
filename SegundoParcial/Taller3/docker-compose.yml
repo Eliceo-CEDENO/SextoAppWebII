@@ -1,0 +1,61 @@
+version: '3'
+
+# Se define los servicios con los puertos y base de datos diferente
+services:
+  inversionistas:
+    build: ./microservices/inversionista-service
+    depends_on:
+      - inversionistas-db
+    ports:
+      - "8000:8000"
+
+  conceptos:
+    build: ./microservices/concepto-service
+    depends_on:
+      - conceptos-db
+    ports:
+      - "7000:7000"
+
+  inversions:
+    build: ./microservices/inversion-service
+    depends_on:
+      - inversions-db
+    ports:
+      - "6000:6000"
+
+  # Aqui va cada base de datos
+
+  inversionistas-db:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./inversionistas-db-data:/data/db
+
+  conceptos-db:
+    image: mongo:latest
+    ports:
+      - "27018:27017"
+    volumes:
+      - ./conceptos-db-data:/data/db
+
+  inversions-db:
+    image: mongo:latest
+    ports:
+      - "27019:27017"
+    volumes:
+      - ./inversions-db-data:/data/db
+
+  #El nginx latest
+  nginx:
+    image: nginx:latest
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - inversionistas
+      - conceptos
+      - inversions
+     
+    
